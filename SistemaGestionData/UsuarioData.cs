@@ -95,6 +95,7 @@ namespace SistemaGestionData
         //Crear usuario
         public static void CrearUsuario(Usuario usuario)
         {
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
@@ -187,6 +188,48 @@ namespace SistemaGestionData
             {
                 Console.WriteLine("Error al cerrar conexion: " + ex.Message);
             }
+        }
+
+        //Obtener usuario por nombre de usuario
+        public static Usuario ObtenerUsuarioPorNombreUsuario(string nombreUsuario)
+        {
+            Usuario usuario = new Usuario();
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    string query = "SELECT Id, Nombre, Apellido, NombreUsuario, Contraseña, Mail FROM Usuario WHERE NombreUsuario = @NombreUsuario";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@NombreUsuario", nombreUsuario);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                usuario = new Usuario
+                                {
+                                    Id = Convert.ToInt32(reader["Id"]),
+                                    Nombre = reader["Nombre"].ToString(),
+                                    Apellido = reader["Apellido"].ToString(),
+                                    NombreUsuario = reader["NombreUsuario"].ToString(),
+                                    Contraseña = reader["Contraseña"].ToString(),
+                                    Mail = reader["Mail"].ToString()
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error al obtener usuario por nombre de usuario: " + ex.Message);
+            }
+
+            return usuario;
         }
 
     }
